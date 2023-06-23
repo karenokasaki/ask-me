@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { ArrowRightIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 
 export default function QuestionDetail() {
    const params = useParams();
@@ -51,42 +52,61 @@ export default function QuestionDetail() {
    console.log(question);
 
    return (
-      <div>
-         <h1>{question.question}</h1>
-         <p>Autor: {question.user}</p>
-         <button>Editar pergunta</button>
+      <div className="p-4">
+         <h1 className="text-2xl font-bold mb-2">{question.question}</h1>
+         <p className="mb-4">Autor: {question.user}</p>
+
+         <button className=" font-bold py-2 px-4 rounded mb-4 flex gap-2 ">
+            <span className="underline text-[#0180C8]">Editar</span>
+            <PencilSquareIcon
+               className="w-6 h-6 text-[#0180C8]"
+               alt="Editar pergunta"
+            />{" "}
+         </button>
 
          <div>
             {question.answers &&
                question.answers.map((answer) => {
                   return (
-                     <div key={answer.answer}>
-                        <p>{answer.answer}</p>
-                        <p>{answer.user}</p>
+                     <div
+                        key={answer.answer}
+                        className="mb-4 bg-gray-100 p-4 rounded-lg"
+                     >
+                        <p className="text-gray-800">{answer.answer}</p>
+                        <p className="text-gray-500">Dev: {answer.user}</p>
                      </div>
                   );
                })}
          </div>
 
-         <form>
-            <label>Resposta</label>
+         <form className="mb-4">
+            <label className="block mb-2 font-bold">Resposta</label>
             <textarea
-               type="text"
+               className="border border-gray-300 p-2 w-full border-none focus:outline-none"
                rows={5}
                name="answer"
                value={form.answer}
                onChange={handleChange}
+               placeholder="Ajude o dev..."
             />
 
-            <label>Nome</label>
-            <input
-               type="text"
-               name="user"
-               value={form.user}
-               onChange={handleChange}
-            />
+            <div className="flex">
+               <input
+                  className="p-2 border-none focus:outline-none w-full"
+                  type="text"
+                  name="user"
+                  value={form.user}
+                  onChange={handleChange}
+                  placeholder="Seu nome..."
+               />
 
-            <button onClick={handleSubmit}>Salvar Resposta</button>
+               <button
+                  onClick={handleSubmit}
+                  className="bg-accent px-6 focus:outline-none hover:bg-black hover:text-white"
+               >
+                  <ArrowRightIcon className="h-6 w-6" />
+               </button>
+            </div>
          </form>
       </div>
    );
