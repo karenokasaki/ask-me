@@ -13,6 +13,10 @@ export default function QuestionDetail() {
    });
    //state que vai dar o trigger no useEffect para rodar novamente e pegar as informações atualizadas
    const [reload, setReload] = useState(false);
+   const [showFormEdit, setShowFormEdit] = useState(false);
+   const [formEdit, setFormEdit] = useState({
+      question: "",
+   });
 
    useEffect(() => {
       async function fetchQuestion() {
@@ -20,6 +24,7 @@ export default function QuestionDetail() {
             `https://webdev103.cyclic.app/questions/${params.id}`
          );
          setQuestion(response.data);
+         setFormEdit({ question: response.data.question });
       }
 
       fetchQuestion();
@@ -27,6 +32,9 @@ export default function QuestionDetail() {
 
    function handleChange(e) {
       setForm({ ...form, [e.target.name]: e.target.value });
+   }
+   function handleChangeEdit(e) {
+      setFormEdit({ ...formEdit, [e.target.name]: e.target.value });
    }
 
    async function handleSubmit(e) {
@@ -49,20 +57,68 @@ export default function QuestionDetail() {
       }
    }
 
+   async function handleSubmitEdit(e) {
+      //e.preventDefault();
+
+      console.log("submit");
+
+      try {
+         await axios.put(
+            `https://webdev103.cyclic.app/questions/${params.id}`,
+            formEdit
+         );
+         setShowFormEdit(false);
+         setReload(!reload);
+      } catch (error) {
+         console.log(error);
+      }
+   }
+
    console.log(question);
 
    return (
       <div className="p-4">
-         <h1 className="text-2xl font-bold mb-2">{question.question}</h1>
-         <p className="mb-4">Autor: {question.user}</p>
+         <div className="">
+            <h1 className="text-2xl font-bold mb-2">{question.question}</h1>
+            <p className="mb-4">Autor: {question.user}</p>
+         </div>
 
-         <button className=" font-bold py-2 px-4 rounded mb-4 flex gap-2 ">
+         <button
+            className=" font-bold py-2 px-4 rounded mb-4 flex gap-2"
+            onClick={() => setShowFormEdit(true)}
+         >
             <span className="underline text-[#0180C8]">Editar</span>
             <PencilSquareIcon
                className="w-6 h-6 text-[#0180C8]"
                alt="Editar pergunta"
             />{" "}
          </button>
+
+         {showFormEdit && (
+            <form className="fixed inset-0 z-50 flex flex-col justify-center items-center rounded w-full shadow-md bg-gray-300 bg-opacity-50">
+               <div className="bg-white p-4 rounded shadow-lg w-2/3">
+                  <textarea
+                     type="text"
+                     name="question"
+                     value={formEdit.question}
+                     onChange={handleChangeEdit}
+                     placeholder="Escreva sua pergunta..."
+                     className="border w-full p-2 focus:outline-none resize-none"
+                  />
+
+                  <div className="flex">
+                     <button
+                        onClick={handleSubmitEdit}
+                        className="bg-accent px-6 focus:outline-none hover:bg-black hover:text-white"
+                     >
+                        <ArrowRightIcon className="h-6 w-6" />
+                     </button>
+                  </div>
+               </div>
+            </form>
+         )}
+
+         <div className="border-b-2 mb-4 border-primary-button w-full m-auto"></div>
 
          <div>
             {question.answers &&
@@ -77,7 +133,15 @@ export default function QuestionDetail() {
                      </div>
                   );
                })}
+
+            {question.answers && !question.answers.length && (
+               <p className="text-gray-400 text-center">
+                  Pergunta sem resposta ainda...
+               </p>
+            )}
          </div>
+
+         <div className="border-b-2 my-4 border-primary-button w-full m-auto"></div>
 
          <form className="mb-4">
             <label className="block mb-2 font-bold">Resposta</label>

@@ -14,7 +14,6 @@ export default function HomePage() {
       user: "",
    });
    const [reload, setReload] = useState(false);
-   const [showForm, setShowForm] = useState(false);
 
    useEffect(() => {
       async function fetchQuestions() {
