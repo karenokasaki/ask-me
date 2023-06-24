@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
-import { ArrowRightIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+   ArrowRightIcon,
+   PencilSquareIcon,
+   TrashIcon,
+   XMarkIcon,
+} from "@heroicons/react/24/outline";
 
 export default function QuestionDetail() {
    const params = useParams();
+   const navigate = useNavigate();
 
    const [question, setQuestion] = useState({});
    const [form, setForm] = useState({
@@ -58,9 +64,7 @@ export default function QuestionDetail() {
    }
 
    async function handleSubmitEdit(e) {
-      //e.preventDefault();
-
-      console.log("submit");
+      e.preventDefault();
 
       try {
          await axios.put(
@@ -69,6 +73,25 @@ export default function QuestionDetail() {
          );
          setShowFormEdit(false);
          setReload(!reload);
+      } catch (error) {
+         console.log(error);
+      }
+   }
+
+   function handleShowFormEdit(e) {
+      e.preventDefault();
+      setShowFormEdit(false);
+   }
+
+   async function handleDelete(e) {
+      e.preventDefault();
+
+      try {
+         await axios.delete(
+            `https://webdev103.cyclic.app/questions/${params.id}`
+         );
+
+         navigate("/");
       } catch (error) {
          console.log(error);
       }
@@ -96,7 +119,17 @@ export default function QuestionDetail() {
 
          {showFormEdit && (
             <form className="fixed inset-0 z-50 flex flex-col justify-center items-center rounded w-full shadow-md bg-gray-300 bg-opacity-50">
-               <div className="bg-white p-4 rounded shadow-lg w-2/3">
+               <div className="bg-white p-4 rounded shadow-lg w-2/3 ">
+                  <button
+                     className="w-full flex justify-end mb-2"
+                     onClick={handleShowFormEdit}
+                  >
+                     <XMarkIcon
+                        className="h-6 w-6 bg-accent  hover:bg-black hover:text-white"
+                        title="Fechar"
+                     />
+                  </button>
+
                   <textarea
                      type="text"
                      name="question"
@@ -106,13 +139,19 @@ export default function QuestionDetail() {
                      className="border w-full p-2 focus:outline-none resize-none"
                   />
 
-                  <div className="flex">
+                  <div className="flex justify-between items-center">
                      <button
                         onClick={handleSubmitEdit}
                         className="bg-accent px-6 focus:outline-none hover:bg-black hover:text-white"
+                        title="Enviar alteração"
                      >
                         <ArrowRightIcon className="h-6 w-6" />
                      </button>
+                     <TrashIcon
+                        className="h-4 w-4 cursor-pointer hover:bg-red-400 hover:text-white"
+                        title="Excluir pergunta"
+                        onClick={handleDelete}
+                     />
                   </div>
                </div>
             </form>
