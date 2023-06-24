@@ -20,6 +20,7 @@ export default function HomePage() {
    });
    const [reload, setReload] = useState(false);
    const [search, setSearch] = useState("");
+   const [filterType, setFilterType] = useState("all");
 
    useEffect(() => {
       async function fetchQuestions() {
@@ -55,7 +56,7 @@ export default function HomePage() {
       }
    }
 
-   console.log(search);
+   console.log(filterType);
 
    return (
       <div className="flex flex-col items-center">
@@ -88,6 +89,28 @@ export default function HomePage() {
             </div>
          </form>
 
+         {/* botões de filtro */}
+         <div className="flex gap-4 mb-4 ">
+            <button
+               onClick={() => setFilterType("all")}
+               className="bg-primary-button px-4 py-2 rounded shadow hover:bg-slate-600 hover:text-white"
+            >
+               Todas
+            </button>
+            <button
+               onClick={() => setFilterType("answered")}
+               className="bg-primary-button  px-4 py-2 rounded shadow hover:bg-slate-600 hover:text-white"
+            >
+               Respondidas
+            </button>
+            <button
+               onClick={() => setFilterType("unanswered")}
+               className="bg-primary-button  px-4 py-2 rounded shadow hover:bg-slate-600 hover:text-white"
+            >
+               Seja o primeiro
+            </button>
+         </div>
+
          {/* Search bar */}
          <div className="w-2/3 flex items-center">
             <MagnifyingGlassIcon className="h-6 w-6 text-accent absolute ml-2" />
@@ -103,6 +126,17 @@ export default function HomePage() {
          <div className="flex flex-col gap-4 sm:grid sm:grid-cols-2 sm:gap-10 mt-7">
             {questions
                .filter((question) => {
+                  if (filterType === "all") {
+                     return true;
+                  }
+                  if (filterType === "answered") {
+                     return question.answers.length > 0;
+                  }
+                  if (filterType === "unanswered") {
+                     return question.answers.length === 0;
+                  }
+               })
+               .filter((question) => {
                   return (
                      question.question
                         .toLowerCase()
@@ -114,10 +148,9 @@ export default function HomePage() {
                   return (
                      <div
                         key={question._id}
-                        className="p-4 bg-white rounded-lg shadow border-none min-h-[50px]"
+                        className="p-4 bg-white rounded-lg shadow border-none min-h-[50px] flex flex-col justify-between"
                      >
                         <Link to={`/questions/${question._id}`}>
-                           <p>{question.question}</p>
                            <div className="text-xs text-gray-400 flex justify-end mt-1 gap-2">
                               <div className="flex">
                                  <CalendarIcon className="h-4 w-6" />
@@ -128,6 +161,7 @@ export default function HomePage() {
                                  {hourFormater(question.createdAt)}
                               </div>
                            </div>
+                           <p>{question.question}</p>
                         </Link>
                         <div className="flex justify-between mt-2 bg-slate-100 p-2">
                            <p className="text-sm">./{question.user}</p>
